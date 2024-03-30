@@ -1,12 +1,18 @@
+import { NextRequest, NextResponse } from "next/server";
+
 const clientId = process.env.CLIENT_ID || '';
 const code = undefined;
 
-export async function GET(){
+export async function GET(req: NextRequest, res: NextResponse){
     if (!code) {
         redirectToAuthCodeFlow(clientId);
     } else {
-        const accessToken = await getAccessToken(clientId, code);
-        const profile = await fetchProfile(accessToken);
+        try{
+            const accessToken = await getAccessToken(clientId, code);
+            return await fetchProfile(accessToken);
+        }catch(error){
+            console.error(error);
+        }
     }
 }
 
@@ -39,7 +45,11 @@ function generateCodeVerifier(length: number) {
 
 async function generateCodeChallenge(codeVerifier: string) {
     const data = new TextEncoder().encode(codeVerifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    const crypto = require('crypto');
+    const hash = crypto.createHash('sha256');
+    hash.update(codeVerifier);
+    let digest = hash.digest();
+    //const digest = await window.crypto.subtle.digest('SHA-256', data);
     return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
