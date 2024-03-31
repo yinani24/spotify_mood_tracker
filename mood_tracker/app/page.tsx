@@ -8,7 +8,7 @@ export default function Home() {
   const handleWindow = async () => {
     const endpoint = 'api'
     const response = await fetch(endpoint)
-    const data = await response.json()
+    // const data = await response.json()
   }
 
   return (

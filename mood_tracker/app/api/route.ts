@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import {redirect} from 'next/navigation';
 
 const clientId = process.env.CLIENT_ID || '';
-const code = undefined;
+// const code = undefined;
 
-export async function GET(req: NextRequest, res: NextResponse){
+export async function GET(req: NextRequest){
+    const code = req.nextUrl.searchParams.get("code");
+    //console.log(code)
     if (!code) {
-        redirectToAuthCodeFlow(clientId);
+        const values = await redirectToAuthCodeFlow(clientId);
+        const res = NextResponse.next()
+        // res.cookies.set("verifier", values['verifier']);
+        return NextResponse.redirect(values.redirect_url);
     } else {
         try{
-            const accessToken = await getAccessToken(clientId, code);
+            const verifier = req.cookies.get("verifier");
+            const verifierValue = verifier ? verifier.value : '';
+            const accessToken = await getAccessToken(verifierValue, clientId, code);
             return await fetchProfile(accessToken);
         }catch(error){
             console.error(error);
@@ -20,17 +29,18 @@ async function redirectToAuthCodeFlow(clientId: string) {
     const verifier = generateCodeVerifier(128);
     const challenge = await generateCodeChallenge(verifier);
 
-    localStorage.setItem("verifier", verifier);
+    // req.cookies.set("verifier", verifier);
 
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
-    params.append("redirect_uri", "http://localhost:3000/dashboard");
+    params.append("redirect_uri", "http://localhost:3000/callback");
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
 
-    document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    //NextResponse.redirect(`https://accounts.spotify.com/authorize?${params.toString()}`);
+    return {'verifier': verifier, 'redirect_url': `https://accounts.spotify.com/authorize?${params.toString()}`}
 }
 
 function generateCodeVerifier(length: number) {
@@ -44,7 +54,7 @@ function generateCodeVerifier(length: number) {
 }
 
 async function generateCodeChallenge(codeVerifier: string) {
-    const data = new TextEncoder().encode(codeVerifier);
+    //const data = new TextEncoder().encode(codeVerifier);
     const crypto = require('crypto');
     const hash = crypto.createHash('sha256');
     hash.update(codeVerifier);
@@ -56,15 +66,14 @@ async function generateCodeChallenge(codeVerifier: string) {
         .replace(/=+$/, '');
 }
 
-async function getAccessToken(clientId: string, code: string) {
-    const verifier = localStorage.getItem("verifier");
+async function getAccessToken(verifierValue: string, clientId: string, code: string) {
 
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("grant_type", "authorization_code");
     params.append("code", code);
-    params.append("redirect_uri", "http://localhost:3000");
-    params.append("code_verifier", verifier!);
+    params.append("redirect_uri", "http://localhost:3000/dashboard");
+    params.append("code_verifier", verifierValue!);
 
     const result = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",
