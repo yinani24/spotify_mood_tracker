@@ -17,14 +17,12 @@ export async function GET(req: NextRequest){
         try{
             const verifier = req.cookies.get("verifier")
             const verifierValue = verifier? verifier.value : '';
-            // console.log(verifierValue)
             const accessToken = await getAccessToken(verifierValue, clientId, code);
-            //console.log(accessToken)
-            // const profile = await fetchProfile(accessToken);
-            // console.log(profile)
-            return await fetchProfile(accessToken);
+            const profile = await fetchProfile(accessToken);
+            return NextResponse.json({profile: profile}, {status: 200});
         }catch(error){
             console.error(error);
+            return NextResponse.json({error: error}, {status: 404});
         }
     }
 }

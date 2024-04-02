@@ -1,22 +1,29 @@
 'use client'
 
 import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Dashboard from '../dashboard/page';
+// import Link from 'next/link';
 // import {cookies} from 'next/headers';
 
 export default function Callback(){
     const searchParams = useSearchParams()
     const code = searchParams.get('code')
     const api = `api?code=${code}`
-    // const cookieStore = cookies()
-    useEffect(() => {
-        async function fetchAPI(){
-            // const cookie = cookieStore.get('verifier')
-            // console.log(cookie)
-            // const code = searchParams.get('code')            
-            await fetch(`${api}`)
+    const router = useRouter()
+    const fetchAPI = async () => {
+        // const cookie = cookieStore.get('verifier')
+        // console.log(cookie)
+        // const code = searchParams.get('code')            
+        const profile = await fetch(`${api}`)
+        if(profile.status === 200){
+            router.push('/dashboard')
         }
+        else{
+            router.push('/')
+        }
+    }
+    useEffect(() => {
         fetchAPI()
     },[])
 
