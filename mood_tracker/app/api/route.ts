@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import {redirect} from 'next/navigation';
 
 const clientId = process.env.CLIENT_ID || '';
 // const code = undefined;
 
 export async function GET(req: NextRequest){
     const code = req.nextUrl.searchParams.get("code");
-    //console.log(code)
+    // console.log(req.nextUrl)
+    // console.log(req.cookies.getAll())
+    // console.log(code)
     if (!code) {
         const values = await redirectToAuthCodeFlow(clientId);
-        const res = NextResponse.next()
-        // res.cookies.set("verifier", values['verifier']);
-        return NextResponse.redirect(values.redirect_url);
+        const res = NextResponse.redirect(values.redirect_url);
+        res.cookies.set("verifier", values.verifier);
+        return res;
     } else {
         try{
-            const verifier = req.cookies.get("verifier");
-            const verifierValue = verifier ? verifier.value : '';
+            const verifier = req.cookies.get("verifier")
+            const verifierValue = verifier? verifier.value : '';
+            // console.log(verifierValue)
             const accessToken = await getAccessToken(verifierValue, clientId, code);
+            //console.log(accessToken)
+            // const profile = await fetchProfile(accessToken);
+            // console.log(profile)
             return await fetchProfile(accessToken);
         }catch(error){
             console.error(error);
@@ -29,8 +33,6 @@ async function redirectToAuthCodeFlow(clientId: string) {
     const verifier = generateCodeVerifier(128);
     const challenge = await generateCodeChallenge(verifier);
 
-    // req.cookies.set("verifier", verifier);
-
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
@@ -39,7 +41,6 @@ async function redirectToAuthCodeFlow(clientId: string) {
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
 
-    //NextResponse.redirect(`https://accounts.spotify.com/authorize?${params.toString()}`);
     return {'verifier': verifier, 'redirect_url': `https://accounts.spotify.com/authorize?${params.toString()}`}
 }
 
@@ -54,12 +55,10 @@ function generateCodeVerifier(length: number) {
 }
 
 async function generateCodeChallenge(codeVerifier: string) {
-    //const data = new TextEncoder().encode(codeVerifier);
     const crypto = require('crypto');
     const hash = crypto.createHash('sha256');
     hash.update(codeVerifier);
     let digest = hash.digest();
-    //const digest = await window.crypto.subtle.digest('SHA-256', data);
     return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
@@ -72,17 +71,18 @@ async function getAccessToken(verifierValue: string, clientId: string, code: str
     params.append("client_id", clientId);
     params.append("grant_type", "authorization_code");
     params.append("code", code);
-    params.append("redirect_uri", "http://localhost:3000/dashboard");
-    params.append("code_verifier", verifierValue!);
+    params.append("redirect_uri", "http://localhost:3000/callback");
+    params.append("code_verifier", verifierValue);
 
     const result = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: params
     });
 
-    const { access_token } = await result.json();
-    return access_token;
+    const access_token = await result.json();
+    console.log("Access Token", access_token)
+    return access_token.access_token;
 }
 
 async function fetchProfile(token: string){
@@ -90,7 +90,9 @@ async function fetchProfile(token: string){
         method: "GET", headers: { Authorization: `Bearer ${token}` }
     });
 
-    return await result.json();
+    const final = await result.json();
+    console.log("Profile", final)
+    return final;
 }
 
 // function populateUI(profile: any) {

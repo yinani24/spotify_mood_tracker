@@ -6,11 +6,6 @@ import Link from "next/link";
 
 export default function Home() {
 
-  const handleWindow = async () => {
-    const endpoint = 'api'
-    await fetch(endpoint)
-  }
-
   return (
   <main className='flex flex-col justify-center items-center gap-10 min-h-screen w-full'>
       <div className='flex w-full justify-center gap-2'>
