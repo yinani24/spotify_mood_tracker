@@ -15,7 +15,7 @@ export default function Callback() {
         try{
             const profile = await fetch(api);
             const responseprofile = await profile.json();
-            console.log("Profile: ", responseprofile)
+            //console.log("Profile: ", responseprofile)
             if (profile.status === 200) {
                 const searchParams = new URLSearchParams();
                 searchParams.set('profile', JSON.stringify(responseprofile.profile));
