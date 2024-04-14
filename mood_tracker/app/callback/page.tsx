@@ -1,11 +1,19 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { use, useEffect } from "react";
+import { Suspense, use, useEffect } from "react";
 import { createUser, getUser } from "../_aws/_database/userModels";
 import jsonToUser from "./_components/jsonToUser";
 
 export default function Callback() {
+    return (
+        <Suspense fallback={<>Loading...</>}>
+            <ComponentCallback />
+        </Suspense>
+    );
+}
+
+function ComponentCallback() {
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
     const api = `api?code=${code}`;

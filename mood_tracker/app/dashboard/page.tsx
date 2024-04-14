@@ -1,17 +1,27 @@
-'use client'
+"use client";
 
-import {useRouter, useSearchParams} from 'next/navigation'
-import { useState } from 'react';
+import { useSearchParams } from "next/navigation";
+import Navbar from "./components/navbar";
+import { Suspense } from "react";
 
-export default function Dashboard(){
-    const searchParams = useSearchParams();
-    const profile = searchParams.get('profile') || '';
-    const parsedProfile = JSON.parse(profile);
-    
+export default function Dashboard() {
     return (
-        <section className='text-white'>
+        <Suspense fallback={<>Loading...</>}>
+            <ComponentDashboard />
+        </Suspense>
+    );
+}
+
+function ComponentDashboard() {
+    const searchParams = useSearchParams();
+    const profile = searchParams.get("profile") || "";
+    const parsedProfile = JSON.parse(profile);
+
+    return (
+        <section className="text-white">
             <h1>Dashboard</h1>
+            <Navbar />
             <p>{profile}</p>
         </section>
-    )
+    );
 }

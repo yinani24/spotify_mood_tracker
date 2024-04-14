@@ -9,17 +9,9 @@ export async function createUser(User: User) {
     
     const command = new PutCommand({
         TableName: table,
-        Item: {
-            id: User.id,
-            display_name: User.display_name,
-            email: User.email,
-            createdAt: User.createdAt,
-            updatedAt: User.updatedAt,
-            spotifyId: User.spotifyId,
-            spotifyURL: User.spotifyURL,
-        },
+        Item: User,
     });
-
+    
     try {
         const response = await docClient.send(command);
         return response;
