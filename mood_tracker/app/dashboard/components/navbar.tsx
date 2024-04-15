@@ -8,8 +8,8 @@ export default function Navbar() {
             <ul className='flex'>
                 {navBar.map((item, index) => (
                     <li key={index} className='ml-4'>
-                        <Link href={item.Link}>
-                            <a className='text-white'>{item.Name}</a>
+                        <Link href={item.Link} className='text-white'>
+                            {item.Name}
                         </Link>
                     </li>
                 ))}
