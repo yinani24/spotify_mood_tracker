@@ -13,11 +13,11 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className="flex w-full">
-                <div className="basis-1/5">
+            <body className="flex w-full h-screen">
+                <div className="basis-1/5 flex-1">
                     <Navbar />
                 </div>
-                <div className="relative basis-4/5 flex flex-1 overflow-hidden">
+                <div className="basis-4/5 relative flex flex-1 overflow-hidden">
                     {children}
                 </div>
             </body>

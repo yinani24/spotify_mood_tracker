@@ -10,7 +10,7 @@ export default function Profile() {
 
 function ComponentProfile() {
     return (
-        <section className="text-white font-[Inter]">
+        <section className="text-white">
             <h1>Profile Page</h1>
         </section>
     );

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import CreateGraph from "./graph/main";
 
 export default function Dashboard() {
     return (
@@ -9,9 +10,11 @@ export default function Dashboard() {
 }
 
 function ComponentDashboard(){
+    
+
     return (
         <main className="text-white flex w-full max-h-screen min-h-0 items-center justify-center">
-            <h1>Home</h1>
+            <CreateGraph/>
         </main>
     );
 }
