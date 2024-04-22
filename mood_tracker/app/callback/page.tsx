@@ -20,11 +20,9 @@ function ComponentCallback() {
     const router = useRouter();
 
     const fetchAPI = async () => {
-        // Prevent fetching API multiple times
         try {
             const profile = await fetch(api);
             const responseprofile = await profile.json();
-            //console.log("Profile: ", responseprofile)
             if (profile.status === 200) {
                 const userProfile = await getUser(responseprofile.profile.id);
                 console.log("User Profile: ", userProfile);
@@ -34,12 +32,7 @@ function ComponentCallback() {
                     );
                     await createUser(userProfile);
                 }
-                const searchParams = new URLSearchParams();
-                searchParams.set(
-                    "profile",
-                    JSON.stringify(responseprofile.profile)
-                );
-                router.push(`/dashboard?${searchParams.toString()}`);
+                router.push(`/dashboard`);
             }
         } catch (error) {
             router.push("/");

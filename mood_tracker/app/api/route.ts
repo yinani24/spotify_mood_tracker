@@ -5,9 +5,6 @@ const clientId = process.env.CLIENT_ID || '';
 
 export async function GET(req: NextRequest){
     const code = req.nextUrl.searchParams.get("code");
-    // console.log(req.nextUrl)
-    // console.log(req.cookies.getAll())
-    // console.log(code)
     if (!code) {
         const values = await redirectToAuthCodeFlow(clientId);
         const res = NextResponse.redirect(values.redirect_url);
@@ -19,7 +16,9 @@ export async function GET(req: NextRequest){
             const verifierValue = verifier? verifier.value : '';
             const accessToken = await getAccessToken(verifierValue, clientId, code);
             const profile = await fetchProfile(accessToken);
-            return NextResponse.json({profile: profile}, {status: 200});
+            const res = NextResponse.json({profile: profile}, {status: 200});
+            res.cookies.set("accessToken", accessToken);
+            return res;
         }catch(error){
             console.error(error);
             return NextResponse.json({error: error}, {status: 404});
@@ -92,7 +91,3 @@ async function fetchProfile(token: string){
     console.log("Profile", final)
     return final;
 }
-
-// function populateUI(profile: any) {
-//     // TODO: Update UI with profile data
-// }

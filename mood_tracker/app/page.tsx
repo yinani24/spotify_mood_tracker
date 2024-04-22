@@ -10,9 +10,6 @@ export default function Home() {
         <Image src={Spotify} alt='spotify logo' width={150} height={150} />
         <h1 className='text-5xl text-[#FFFFFF] font-[Inter] font-bold'>Mood Tracker</h1>
       </div>
-      {/* <button onClick={handleWindow} className='border font-[Inter] text-[#1DB954] font-semibold rounded-xl p-2 shadow-md shadow-[#1DB954]'>
-        {'Connect your spotify ->'}
-      </button> */}
       <Link href='/api' className='border font-[Inter] text-[#1DB954] font-semibold rounded-xl p-2 shadow-md shadow-[#1DB954]'>
           {'Connect your spotify ->'}
       </Link>
