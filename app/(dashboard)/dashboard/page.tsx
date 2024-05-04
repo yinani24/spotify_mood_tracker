@@ -10,8 +10,6 @@ export default function Dashboard() {
 }
 
 function ComponentDashboard(){
-    
-
     return (
         <main className="text-white flex w-full max-h-screen min-h-0 items-center justify-center">
             <CreateGraph/>
